@@ -11,6 +11,8 @@
  *   table.act(state.toAct, { type: 'raise', amount: state.legalActions.minRaiseTo });
  */
 
+import { Table } from "./table.js";
+
 export {
   createDeck,
   formatCard,
