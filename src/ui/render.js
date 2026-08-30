@@ -1,6 +1,8 @@
 import { boardHtml, holeCardsHtml } from "./cards.js";
 import { chipStackHtml } from "./chips.js";
 
+export const SEAT_COUNT = 6;
+
 const STREET_LABEL = {
   preflop: "Preflop",
   flop: "Flop",
@@ -25,22 +27,44 @@ function seatBadges(player) {
   return bits.join("");
 }
 
+function vacantPlayer(seat) {
+  return {
+    seat,
+    name: "Empty",
+    isHuman: false,
+    stack: 0,
+    betThisStreet: 0,
+    folded: false,
+    allIn: false,
+    lastAction: null,
+    isDealer: false,
+    isSB: false,
+    isBB: false,
+    isToAct: false,
+    holeCards: [],
+    occupied: false,
+  };
+}
+
 function seatHtml(player) {
+  const occupied = player.occupied !== false;
   const classes = [
     `seat seat-${player.seat}`,
     player.isHuman ? "you" : "",
-    player.folded ? "is-folded" : "",
-    player.isToAct ? "is-acting" : "",
-    player.allIn ? "is-allin" : "",
+    !occupied ? "is-empty" : "",
+    occupied && player.folded ? "is-folded" : "",
+    occupied && player.isToAct ? "is-acting" : "",
+    occupied && player.allIn ? "is-allin" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
-  const action = player.lastAction
-    ? `<div class="seat-action">${escapeHtml(player.lastAction)}</div>`
-    : "";
+  const action =
+    occupied && player.lastAction
+      ? `<div class="seat-action">${escapeHtml(player.lastAction)}</div>`
+      : "";
   const bet =
-    player.betThisStreet > 0
+    occupied && player.betThisStreet > 0
       ? `<div class="seat-bet">
           ${chipStackHtml(player.betThisStreet, { compact: true })}
           <span>${player.betThisStreet}</span>
@@ -48,22 +72,44 @@ function seatHtml(player) {
       : `<div class="seat-bet empty"></div>`;
 
   return `
-    <section class="${classes}" data-seat="${player.seat}">
+    <section class="${classes}" data-seat="${player.seat}" data-occupied="${occupied ? "true" : "false"}">
       ${bet}
       <div class="seat-panel">
-        ${holeCardsHtml(player.holeCards, { folded: player.folded })}
+        ${holeCardsHtml(player.holeCards, {
+          folded: Boolean(occupied && player.folded),
+          vacant: !occupied,
+          hero: Boolean(player.isHuman),
+        })}
         <div class="seat-meta">
           <div class="seat-name">
-            ${escapeHtml(player.name)}
-            ${seatBadges(player)}
+            ${escapeHtml(occupied ? player.name : "Empty")}
+            ${occupied ? seatBadges(player) : ""}
           </div>
-          <div class="seat-stack">${player.stack}</div>
-          ${chipStackHtml(player.stack, { compact: true, maxPiles: 3, label: `${player.name} stack` })}
+          <div class="seat-stack">${occupied ? player.stack : "—"}</div>
+          ${
+            occupied
+              ? chipStackHtml(player.stack, {
+                  compact: true,
+                  maxPiles: 3,
+                  label: `${player.name} stack`,
+                })
+              : ""
+          }
         </div>
       </div>
       ${action}
     </section>
   `;
+}
+
+/** Always emit all 6 oval seats, including vacant chairs. */
+export function seatsHtml(players = []) {
+  const bySeat = new Map((players ?? []).map((p) => [p.seat, p]));
+  return Array.from({ length: SEAT_COUNT }, (_, seat) => {
+    const player = bySeat.get(seat);
+    const occupied = player && player.occupied !== false;
+    return seatHtml(occupied ? { ...player, occupied: true } : vacantPlayer(seat));
+  }).join("");
 }
 
 function winnerBanner(state) {
@@ -176,7 +222,7 @@ export function renderApp(root, { state, raiseTo }) {
               </div>
             </div>
           </div>
-          ${state.players.map(seatHtml).join("")}
+          ${seatsHtml(state.players)}
         </div>
         <aside class="log" aria-label="Hand history">
           <h2>Hand log</h2>

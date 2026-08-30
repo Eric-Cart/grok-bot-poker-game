@@ -8,6 +8,6 @@ export default defineConfig({
     port: 5173,
   },
   test: {
-    include: ["src/engine/**/*.test.js"],
+    include: ["src/**/*.test.js"],
   },
 });

@@ -596,6 +596,7 @@ export class Table {
           seat: p.seat,
           name: p.name,
           isHuman: p.isHuman,
+          occupied: true,
           stack: p.stack,
           betThisStreet: p.betThisStreet,
           contributed: p.contributed,

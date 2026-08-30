@@ -141,6 +141,23 @@ h1 {
   min-height: 88px;
 }
 
+.board-slot {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.board-slot .slot-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(226, 240, 230, 0.72);
+  pointer-events: none;
+}
+
 .pot-well {
   margin-top: 12px;
   display: flex;
@@ -198,8 +215,23 @@ h1 {
   box-shadow: 0 0 0 2px var(--gold), 0 8px 18px rgba(0, 0, 0, 0.28);
 }
 
-.seat.is-folded { opacity: 0.46; }
-.seat.is-folded .hole-cards { filter: grayscale(0.6); }
+.seat.is-folded { opacity: 0.72; }
+.seat.is-folded .hole-cards { filter: grayscale(0.35); }
+
+.seat.is-empty {
+  opacity: 1;
+}
+
+.seat.is-empty .seat-panel {
+  border-style: dashed;
+  border-color: rgba(232, 240, 234, 0.28);
+  background: rgba(6, 14, 18, 0.42);
+}
+
+.seat.you .hole-cards.hero {
+  transform: scale(1.06);
+  transform-origin: bottom center;
+}
 
 .seat-name {
   display: flex;
@@ -281,8 +313,8 @@ h1 {
 }
 
 .playing-card.placeholder {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px dashed rgba(255, 255, 255, 0.16);
+  background: rgba(4, 28, 16, 0.4);
+  border: 2px dashed rgba(226, 240, 230, 0.5);
   box-shadow: none;
 }
 
