@@ -1,0 +1,17 @@
+{
+  "name": "grok-bot-poker-game",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Playable Texas Hold'em (NLHE) in the browser",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  }
+}
