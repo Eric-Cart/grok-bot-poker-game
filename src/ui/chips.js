@@ -20,8 +20,8 @@ export function breakChips(amount) {
   return stacks;
 }
 
-export function chipStackHtml(amount, { compact = false, label = "" } = {}) {
-  const stacks = breakChips(amount);
+export function chipStackHtml(amount, { compact = false, label = "", maxPiles = 6 } = {}) {
+  const stacks = breakChips(amount).slice(0, maxPiles);
   const shown = stacks.map((s) => ({ ...s, count: Math.min(s.count, compact ? 6 : 9) }));
   if (shown.length === 0) {
     return `<div class="chip-rack empty" aria-hidden="true"></div>`;

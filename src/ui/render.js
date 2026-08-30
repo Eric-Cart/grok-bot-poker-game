@@ -58,7 +58,7 @@ function seatHtml(player) {
             ${seatBadges(player)}
           </div>
           <div class="seat-stack">${player.stack}</div>
-          ${chipStackHtml(player.stack, { compact: true, label: `${player.name} stack` })}
+          ${chipStackHtml(player.stack, { compact: true, maxPiles: 3, label: `${player.name} stack` })}
         </div>
       </div>
       ${action}
@@ -139,8 +139,10 @@ function actionBar(state, raiseTo) {
 }
 
 export function renderApp(root, { state, raiseTo }) {
-  const potLabel = state.pots.length > 1 ? "Pots" : "Pot";
-  const side = state.pots.length > 1
+  const allInLive = state.players.some((p) => p.allIn && !p.folded);
+  const showSides =
+    state.pots.length > 1 && (allInLive || (state.handOver && state.pots.length > 1));
+  const side = showSides
     ? state.pots.map((p, i) => `${i === 0 ? "Main" : "Side"} ${p.amount}`).join(" · ")
     : "";
 
@@ -168,7 +170,7 @@ export function renderApp(root, { state, raiseTo }) {
                 ${boardHtml(state.communityCards)}
                 <div class="pot-well">
                   ${chipStackHtml(state.potTotal, { label: "pot" })}
-                  <div class="pot-label">${potLabel} ${state.potTotal}${side ? ` · ${side}` : ""}</div>
+                  <div class="pot-label">Pot ${state.potTotal}${side ? ` · ${side}` : ""}</div>
                 </div>
                 ${winnerBanner(state)}
               </div>
