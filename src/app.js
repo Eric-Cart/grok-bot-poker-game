@@ -2,7 +2,10 @@ import { chooseAiAction, createTable } from "./engine/index.js";
 import { mount } from "./ui/index.js";
 
 const root = document.querySelector("#app");
-const table = createTable();
+const table = createTable({
+  occupiedSeats: [0, 2, 4],
+  dealerIndex: 2,
+});
 
 let raiseTo = null;
 let aiTimer = 0;

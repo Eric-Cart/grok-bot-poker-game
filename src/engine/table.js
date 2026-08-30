@@ -47,20 +47,28 @@ export class Table {
       "You",
       ...AI_NAMES.slice(0, this.seatCount - 1),
     ];
+    const occupiedSeats = new Set(
+      config.occupiedSeats ??
+        Array.from({ length: this.seatCount }, (_, seat) => seat),
+    );
 
-    this.players = Array.from({ length: this.seatCount }, (_, seat) => ({
-      seat,
-      name: names[seat] ?? `Seat ${seat + 1}`,
-      isHuman: seat === this.humanSeat,
-      stack: config.stacks?.[seat] ?? this.startingStack,
-      holeCards: [],
-      betThisStreet: 0,
-      contributed: 0,
-      folded: false,
-      allIn: false,
-      hasActedThisStreet: false,
-      lastAction: null,
-    }));
+    this.players = Array.from({ length: this.seatCount }, (_, seat) => {
+      const occupied = occupiedSeats.has(seat);
+      return {
+        seat,
+        name: occupied ? (names[seat] ?? `Seat ${seat + 1}`) : "Empty",
+        isHuman: occupied && seat === this.humanSeat,
+        occupied,
+        stack: occupied ? (config.stacks?.[seat] ?? this.startingStack) : 0,
+        holeCards: [],
+        betThisStreet: 0,
+        contributed: 0,
+        folded: !occupied,
+        allIn: false,
+        hasActedThisStreet: false,
+        lastAction: null,
+      };
+    });
 
     this.dealerIndex = config.dealerIndex ?? 3;
     this.handNumber = 0;
@@ -80,7 +88,7 @@ export class Table {
   startHand(overrides = {}) {
     if (this.autoRebuy) {
       for (const p of this.players) {
-        if (p.stack <= 0) p.stack = this.startingStack;
+        if (p.occupied && p.stack <= 0) p.stack = this.startingStack;
       }
     }
 
@@ -107,10 +115,10 @@ export class Table {
       p.holeCards = [];
       p.betThisStreet = 0;
       p.contributed = 0;
-      p.folded = p.stack <= 0;
+      p.folded = !p.occupied || p.stack <= 0;
       p.allIn = false;
       p.hasActedThisStreet = false;
-      p.lastAction = p.stack <= 0 ? "sitting out" : null;
+      p.lastAction = !p.occupied ? null : p.stack <= 0 ? "sitting out" : null;
     }
 
     this.deck = overrides.deck
@@ -183,7 +191,8 @@ export class Table {
   nextLiveSeat(from) {
     for (let i = 1; i <= this.seatCount; i++) {
       const seat = (from + i) % this.seatCount;
-      if (this.players[seat].stack > 0) return seat;
+      const p = this.players[seat];
+      if (p.occupied && p.stack > 0) return seat;
     }
     return from;
   }
@@ -596,7 +605,8 @@ export class Table {
           seat: p.seat,
           name: p.name,
           isHuman: p.isHuman,
-          occupied: true,
+          occupied: Boolean(p.occupied),
+          sittingOut: Boolean(p.occupied && p.lastAction === "sitting out"),
           stack: p.stack,
           betThisStreet: p.betThisStreet,
           contributed: p.contributed,

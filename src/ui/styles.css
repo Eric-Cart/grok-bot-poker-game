@@ -90,6 +90,7 @@ h1 {
   width: min(980px, 100%);
   aspect-ratio: 1.72 / 1;
   margin: 28px auto 36px;
+  overflow: visible;
 }
 
 .rail {
@@ -191,6 +192,12 @@ h1 {
   gap: 6px;
 }
 
+.seat.is-empty,
+.seat.is-sitting-out,
+.seat.is-folded {
+  display: flex;
+}
+
 .seat-0 { left: 50%; bottom: -18px; transform: translateX(-50%); }
 .seat-1 { left: 1%; bottom: 16%; }
 .seat-2 { left: 6%; top: 6%; }
@@ -218,7 +225,8 @@ h1 {
 .seat.is-folded { opacity: 0.72; }
 .seat.is-folded .hole-cards { filter: grayscale(0.35); }
 
-.seat.is-empty {
+.seat.is-empty,
+.seat.is-sitting-out {
   opacity: 1;
 }
 

@@ -48,10 +48,12 @@ function vacantPlayer(seat) {
 
 function seatHtml(player) {
   const occupied = player.occupied !== false;
+  const sittingOut = Boolean(player.sittingOut || player.lastAction === "sitting out");
   const classes = [
     `seat seat-${player.seat}`,
     player.isHuman ? "you" : "",
     !occupied ? "is-empty" : "",
+    occupied && sittingOut ? "is-sitting-out" : "",
     occupied && player.folded ? "is-folded" : "",
     occupied && player.isToAct ? "is-acting" : "",
     occupied && player.allIn ? "is-allin" : "",
@@ -72,7 +74,7 @@ function seatHtml(player) {
       : `<div class="seat-bet empty"></div>`;
 
   return `
-    <section class="${classes}" data-seat="${player.seat}" data-occupied="${occupied ? "true" : "false"}">
+    <section class="${classes}" data-seat="${player.seat}" data-occupied="${occupied ? "true" : "false"}" data-sitting-out="${sittingOut ? "true" : "false"}">
       ${bet}
       <div class="seat-panel">
         ${holeCardsHtml(player.holeCards, {

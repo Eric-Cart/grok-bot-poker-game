@@ -67,4 +67,32 @@ describe("table UX review", () => {
     expect(html).toMatch(/Empty/);
     expect(html).not.toContain("display: none");
   });
+
+  it("keeps a sitting-out player in their oval seat", () => {
+    const html = seatsHtml([
+      {
+        seat: 0,
+        name: "You",
+        isHuman: true,
+        stack: 1000,
+        holeCards: [null, null],
+        occupied: true,
+      },
+      {
+        seat: 4,
+        name: "Ace",
+        isHuman: false,
+        stack: 0,
+        holeCards: [],
+        occupied: true,
+        sittingOut: true,
+        lastAction: "sitting out",
+      },
+    ]);
+    expect(html.match(/data-seat="/g)).toHaveLength(SEAT_COUNT);
+    expect(html).toContain('data-seat="4"');
+    expect(html).toContain("Ace");
+    expect(html).toContain('data-sitting-out="true"');
+    expect(html).toContain("is-sitting-out");
+  });
 });
