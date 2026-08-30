@@ -198,6 +198,23 @@ describe("full-hand smoke", () => {
   });
 });
 
+describe("6-max seats", () => {
+  it("keeps all 6 seats in public state when some are unoccupied", () => {
+    const table = sixMax({
+      occupiedSeats: [0, 2, 4],
+      dealerIndex: 2,
+    });
+    table.startHand();
+    const state = table.getPublicState(0);
+    expect(state.players).toHaveLength(6);
+    expect(state.players.filter((p) => p.occupied).map((p) => p.seat)).toEqual([
+      0, 2, 4,
+    ]);
+    expect(state.players.filter((p) => !p.occupied)).toHaveLength(3);
+    expect(state.players[1].name).toBe("Empty");
+  });
+});
+
 describe("heads-up blinds", () => {
   it("posts the button as SB when only two players have chips", () => {
     const table = sixMax({
